@@ -343,7 +343,6 @@ Para un usuario existente, el controlador devuelve `204 No Content`. Después, c
 | Buscar usuario por ID inexistente | `404 Not Found` |
 | Eliminar usuario por ID inexistente | `404 Not Found` |
 
-**Observación:** el código recibido no incluye anotaciones `@Valid` ni un conjunto completo de validaciones de formato de RUT, correo o fechas. Por ello, estas comprobaciones no deben presentarse como implementadas.
 
 ## 10. Compilación, pruebas y empaquetado con Maven
 
@@ -366,64 +365,6 @@ Si se completa correctamente, comprueba el artefacto:
 ```cmd
 dir target\*.jar
 ```
-
-La clase de prueba incluida, `EpMsJavaAutenticacionUsuariosApplicationTests`, contiene una prueba `contextLoads()`; **no constituye por sí sola una suite de pruebas funcionales de todos los endpoints**. Las operaciones REST se deben demostrar adicionalmente mediante Postman.
-
-## 11. Organización del repositorio y control de versiones
-
-Se sigue una estructura de ramas orientada a organizar las funcionalidades:
-
-- `main`: versión estable destinada a entrega.
-- `develop`: integración de cambios.
-- `feature/entidades-usuarios`: entidades y relaciones JPA.
-- `feature/repositorios-usuarios`: repositorios de acceso a datos.
-- `feature/servicios-usuarios`: lógica de negocio.
-- `feature/controllers-usuarios`: controladores REST, cuando se integren.
-- `feature/autenticacion-jwt`: rama sugerida únicamente si se implementa efectivamente esa funcionalidad.
-
-El equipo incorpora las funcionalidades mediante **Pull Requests** hacia `develop` y, tras probar la versión integrada, hacia `main`. Se utilizan mensajes de commit descriptivos, por ejemplo `feat: implementar servicios de usuarios regiones y comunas`.
-
-> La enumeración de ramas describe el flujo de trabajo; el README no certifica cuáles ramas o Pull Requests siguen existentes en GitHub al momento de la evaluación. Comprobarlos en la pestaña **Branches** y en el historial de **Pull requests**.
-
-## 12. Consideraciones de seguridad y mejoras pendientes
-
-El código adjunto permite identificar estos puntos que deben tratarse antes de utilizar el servicio como solución de autenticación completa:
-
-1. **Contraseñas:** se almacenan como hashes de BCrypt en `UsuarioServiceImpl`, pero el campo `contrasena` tiene un getter público en `Usuario`. Hay que ocultar ese dato de las respuestas JSON, por ejemplo con un DTO de respuesta que no incluya contraseña ni hash.
-2. **JWT:** hay dependencia de OAuth2 Resource Server, pero **no existen en el código adjunto un controlador de login, un emisor de tokens JWT ni una configuración completa de su validación**. No presentar estas funcionalidades como terminadas.
-3. **Permisos y roles:** los valores `COMPRADOR` y `STAFF_DE_PUERTA` se almacenan en la entidad, pero esto no demuestra que estén implementadas reglas de autorización por rol en los endpoints.
-4. **Base de datos:** el archivo `data/bdusuarios.mv.db` es local y puede contener registros de usuarios; no debe publicarse junto al código fuente.
-5. **Validación de datos:** faltan validaciones declarativas completas de algunos campos de usuario.
-
-### Exclusiones recomendadas en `.gitignore`
-
-Asegúrate de incorporar al `.gitignore` del repositorio, como mínimo:
-
-```gitignore
-target/
-data/
-*.mv.db
-*.trace.db
-.env
-.env.*
-!.env.example
-```
-
-Si algún archivo sensible **ya fue incluido en Git**, agregarlo a `.gitignore` no lo elimina automáticamente del historial. Revisa el historial antes de hacer público el repositorio.
-
-## 13. Guion de demostración para la evaluación
-
-Para el video solicitado en la Evaluación Parcial N.º 2 (entre **3 y 8 minutos**):
-
-1. Presentar EventPass, la finalidad de este microservicio y las capas de su código.
-2. Mostrar `pom.xml` y `application.properties`, explicando Java, Spring Boot, JPA, H2 y puerto `8081`.
-3. Mostrar las entidades `Region`, `Comuna` y `Usuario`, y sus relaciones JPA.
-4. Ejecutar comandos Maven y mostrar el resultado del empaquetado `.jar`.
-5. Explicar cómo clonar y arrancar el proyecto siguiendo este README.
-6. Demostrar desde Postman las operaciones CRUD y al menos los casos de error previstos; mostrar los códigos HTTP y los datos persistidos.
-7. Cerrar explicando el versionado Git y los límites de seguridad de la versión presentada.
-
-El video debe emplear la voz de los integrantes, explicar las operaciones con orden técnico y mostrar resultados reales de las pruebas. No se deben presentar respuestas o pruebas que no se hayan ejecutado correctamente.
 
 ---
 
